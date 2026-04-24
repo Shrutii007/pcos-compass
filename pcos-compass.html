@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PCOS Compass 🌸</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --purple:#7c3aed;--pink:#db2777;--light:#fff0f6;--light2:#f3e8ff;
+      --text:#1f2937;--muted:#6b7280;--border:#e9d5ff;--white:#ffffff;
+      --green:#059669;--amber:#d97706;--red:#dc2626;
+    }
+    body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,var(--light),var(--light2));min-height:100vh;padding:24px 16px 48px;color:var(--text);}
+    .app{max-width:660px;margin:0 auto;}
+
+    /* HERO */
+    .hero{text-align:center;margin-bottom:1.8rem;}
+    .hero-icon{font-size:40px;margin-bottom:8px;display:block;}
+    .hero h1{font-family:'DM Serif Display',serif;font-size:2.2rem;font-weight:400;color:var(--purple);margin-bottom:6px;}
+    .hero p{font-size:13.5px;color:var(--muted);line-height:1.6;max-width:420px;margin:0 auto;}
+
+    /* TABS */
+    .tabs{display:flex;gap:8px;margin-bottom:1.2rem;background:white;border-radius:50px;padding:5px;box-shadow:0 2px 12px rgba(124,58,237,0.08);}
+    .tab{flex:1;padding:9px;border:none;background:transparent;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+    .tab.active{background:linear-gradient(135deg,var(--purple),var(--pink));color:white;}
+
+    /* CARD */
+    .card{background:white;border-radius:20px;padding:1.6rem;box-shadow:0 4px 24px rgba(124,58,237,0.08);margin-bottom:1rem;}
+
+    /* QUIZ */
+    .quiz-progress{height:4px;background:var(--border);border-radius:4px;margin-bottom:1.4rem;overflow:hidden;}
+    .quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:4px;transition:width 0.4s ease;}
+    .quiz-step{display:none;}
+    .quiz-step.active{display:block;}
+    .quiz-q{font-family:'DM Serif Display',serif;font-size:1.2rem;font-weight:400;color:var(--text);margin-bottom:1rem;line-height:1.4;}
+    .quiz-subtitle{font-size:12.5px;color:var(--muted);margin-bottom:1.2rem;margin-top:-0.6rem;}
+    .options{display:flex;flex-direction:column;gap:10px;}
+    .option{padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);cursor:pointer;transition:all 0.15s;text-align:left;background:white;}
+    .option:hover{border-color:var(--purple);background:#fdf4ff;}
+    .option.selected{border-color:var(--purple);background:#f3e8ff;color:var(--purple);font-weight:500;}
+    .quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem;}
+    .btn-back{padding:9px 18px;border:1.5px solid var(--border);border-radius:50px;background:white;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;}
+    .btn-back:hover{border-color:var(--purple);color:var(--purple);}
+    .btn-next{padding:9px 22px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.2s;}
+    .btn-next:disabled{opacity:0.4;cursor:not-allowed;}
+    .btn-next:hover:not(:disabled){opacity:0.88;}
+    .step-counter{font-size:12px;color:var(--muted);}
+
+    /* RESULT */
+    .result-area{display:none;}
+    .result-badge{display:inline-block;padding:6px 18px;border-radius:50px;font-size:13px;font-weight:600;margin-bottom:1rem;}
+    .badge-low{background:#d1fae5;color:#065f46;}
+    .badge-medium{background:#fef3c7;color:#92400e;}
+    .badge-high{background:#fee2e2;color:#991b1b;}
+    .result-title{font-family:'DM Serif Display',serif;font-size:1.5rem;font-weight:400;margin-bottom:0.6rem;color:var(--text);}
+    .result-body{font-size:14px;line-height:1.8;color:var(--muted);margin-bottom:1.2rem;}
+    .result-symptoms{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.2rem;}
+    .symptom-tag{background:#f3e8ff;color:var(--purple);border-radius:20px;padding:4px 12px;font-size:12px;}
+    .next-steps{background:#fdf4ff;border:1px solid var(--border);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;}
+    .next-steps h3{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:0.6rem;}
+    .next-steps ul{list-style:none;display:flex;flex-direction:column;gap:6px;}
+    .next-steps li{font-size:13px;color:var(--text);line-height:1.5;padding-left:20px;position:relative;}
+    .next-steps li::before{content:"→";position:absolute;left:0;color:var(--purple);}
+    .btn-retake{padding:10px 22px;border:1.5px solid var(--border);border-radius:50px;background:white;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;margin-right:8px;}
+    .btn-retake:hover{border-color:var(--purple);color:var(--purple);}
+
+    /* INFO HUB */
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;}
+    .info-card{background:white;border:1.5px solid var(--border);border-radius:16px;padding:1.1rem;cursor:pointer;transition:all 0.15s;}
+    .info-card:hover{border-color:var(--purple);transform:translateY(-2px);}
+    .info-card.open{border-color:var(--purple);background:#fdf4ff;}
+    .info-icon{font-size:24px;margin-bottom:8px;display:block;}
+    .info-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:4px;}
+    .info-sub{font-size:12px;color:var(--muted);}
+    .info-detail{display:none;background:white;border:1.5px solid var(--border);border-radius:16px;padding:1.2rem;margin-bottom:1rem;}
+    .info-detail.open{display:block;}
+    .info-detail h3{font-family:'DM Serif Display',serif;font-size:1.2rem;font-weight:400;margin-bottom:0.8rem;color:var(--purple);}
+    .info-detail p{font-size:13.5px;line-height:1.8;color:var(--text);margin-bottom:0.7rem;}
+    .info-detail ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:0.7rem;}
+    .info-detail li{font-size:13.5px;color:var(--text);padding-left:20px;position:relative;line-height:1.5;}
+    .info-detail li::before{content:"🌸";position:absolute;left:0;font-size:11px;top:3px;}
+
+    /* MYTH BUSTER */
+    .myth-card{background:white;border:1.5px solid var(--border);border-radius:16px;padding:1.2rem;margin-bottom:12px;}
+    .myth-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--red);margin-bottom:6px;}
+    .myth-text{font-size:14px;font-weight:500;color:var(--text);margin-bottom:10px;line-height:1.4;}
+    .myth-divider{height:1px;background:var(--border);margin-bottom:10px;}
+    .fact-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--green);margin-bottom:6px;}
+    .fact-text{font-size:13.5px;color:var(--muted);line-height:1.7;}
+
+    /* DISCLAIMER */
+    .disclaimer{background:white;border-radius:14px;padding:10px 16px;font-size:11.5px;color:var(--muted);line-height:1.5;text-align:center;margin-top:1rem;}
+
+    @media(max-width:480px){.info-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <span class="hero-icon">🌸</span>
+    <h1>PCOS Compass</h1>
+    <p>Your free, private guide to understanding PCOS — symptoms, science, and support.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('quiz')">🔍 Symptom Check</button>
+    <button class="tab" onclick="switchTab('info')">📚 Info Hub</button>
+    <button class="tab" onclick="switchTab('myths')">💥 Myth Buster</button>
+  </div>
+
+  <!-- ===== QUIZ TAB ===== -->
+  <div id="tab-quiz">
+    <div class="card">
+      <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill" style="width:12.5%"></div></div>
+
+      <!-- Q1 -->
+      <div class="quiz-step active" id="step-0">
+        <p class="quiz-q">How would you describe your menstrual cycle?</p>
+        <div class="options">
+          <button class="option" onclick="select(0,0,0)">Regular — comes every 21–35 days</button>
+          <button class="option" onclick="select(0,1,1)">Slightly irregular — varies by more than a week</button>
+          <button class="option" onclick="select(0,2,2)">Very irregular — unpredictable or skips months</button>
+          <button class="option" onclick="select(0,3,2)">Absent — haven't had a period in 3+ months</button>
+        </div>
+        <div class="quiz-nav">
+          <span class="step-counter">1 of 8</span>
+          <button class="btn-next" id="next-0" disabled onclick="nextStep(0)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-step" id="step-1">
+        <p class="quiz-q">Do you experience acne, especially on the jaw, chin, or back?</p>
+        <div class="options">
+          <button class="option" onclick="select(1,0,0)">No acne</button>
+          <button class="option" onclick="select(1,1,1)">Mild — occasional breakouts</button>
+          <button class="option" onclick="select(1,2,2)">Moderate — regular breakouts that are hard to control</button>
+          <button class="option" onclick="select(1,3,2)">Severe — persistent cystic acne</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep(1)">← Back</button>
+          <span class="step-counter">2 of 8</span>
+          <button class="btn-next" id="next-1" disabled onclick="nextStep(1)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-step" id="step-2">
+        <p class="quiz-q">Have you noticed unusual hair growth on your face, chest, or stomach?</p>
+        <p class="quiz-subtitle">(This is called hirsutism and is caused by high androgens)</p>
+        <div class="options">
+          <button class="option" onclick="select(2,0,0)">No — no unusual hair growth</button>
+          <button class="option" onclick="select(2,1,1)">A little — some fine dark hair on face/body</button>
+          <button class="option" onclick="select(2,2,2)">Yes — noticeable hair on chin, upper lip, or chest</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep(2)">← Back</button>
+          <span class="step-counter">3 of 8</span>
+          <button class="btn-next" id="next-2" disabled onclick="nextStep(2)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="quiz-step" id="step-3">
+        <p class="quiz-q">Are you experiencing hair thinning or loss on your scalp?</p>
+        <div class="options">
+          <button class="option" onclick="select(3,0,0)">No hair thinning</button>
+          <button class="option" onclick="select(3,1,1)">Slightly more hair fall than usual</button>
+          <button class="option" onclick="select(3,2,2)">Noticeable thinning, especially at the crown or part</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep(3)">← Back</button>
+          <span class="step-counter">4 of 8</span>
+          <button class="btn-next" id="next-3" disabled onclick="nextStep(3)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="quiz-step" id="step-4">
+        <p class="quiz-q">How would you describe your weight and metabolism?</p>
+        <div class="options">
+          <button class="option" onclick="select(4,0,0)">Stable — no unusual weight changes</button>
+          <button class="option" onclick="select(4,1,1)">I gain weight easily, especially around my belly</button>
+          <button class="option" onclick="select(4,2,2)">I struggle to lose weight despite diet and exercise</button>
+          <button class="option" onclick="select(4,3,0)">I am underweight or have no weight concerns</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep(4)">← Back</button>
+          <span class="step-counter">5 of 8</span>
+          <button class="btn-next" id="next-4" disabled onclick="nextStep(4)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="quiz-step" id="step-5">
+        <p class="quiz-q">Do you experience mood swings, anxiety, or depression?</p>
+        <div class="options">
+          <button class="option" onclick="select(5,0,0)">Rarely or never</button>
+          <button class="option" onclick="select(5,1,1)">Sometimes, around my period</button>
+          <button class="option" onclick="select(5,2,2)">Frequently — affects my daily life</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep(5)">← Back</button>
+          <span class="step-counter">6 of 8</span>
+          <button class="btn-next" id="next-5" disabled onclick="nextStep(5)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="quiz-step" id="step-6">
+        <p class="quiz-q">Do you experience fatigue or low energy, even after enough sleep?</p>
+        <div class="options">
+          <button class="option" onclick="select(6,0,0)">No — my energy levels are normal</button>
+          <button class="option" onclick="select(6,1,1)">Sometimes — occasional unexplained tiredness</button>
+          <button class="option" onclick="select(6,2,2)">Often — I feel tired most of the time</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep(6)">← Back</button>
+          <span class="step-counter">7 of 8</span>
+          <button class="btn-next" id="next-6" disabled onclick="nextStep(6)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="quiz-step" id="step-7">
+        <p class="quiz-q">Have you ever been told you have high blood sugar, insulin resistance, or pre-diabetes?</p>
+        <div class="options">
+          <button class="option" onclick="select(7,0,0)">No</button>
+          <button class="option" onclick="select(7,1,2)">Yes — diagnosed with insulin resistance or pre-diabetes</button>
+          <button class="option" onclick="select(7,2,1)">Not sure — never tested</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep(7)">← Back</button>
+          <span class="step-counter">8 of 8</span>
+          <button class="btn-next" id="next-7" disabled onclick="showResult()">See my result →</button>
+        </div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-area" id="resultArea">
+        <div id="resultBadge" class="result-badge"></div>
+        <h2 class="result-title" id="resultTitle"></h2>
+        <p class="result-body" id="resultBody"></p>
+        <div class="result-symptoms" id="resultSymptoms"></div>
+        <div class="next-steps" id="nextSteps"></div>
+        <button class="btn-retake" onclick="retake()">↩ Retake quiz</button>
+      </div>
+    </div>
+    <div class="disclaimer">⚠️ This quiz is for educational purposes only and does not diagnose PCOS. Always consult a licensed healthcare provider.</div>
+  </div>
+
+  <!-- ===== INFO TAB ===== -->
+  <div id="tab-info" style="display:none">
+    <div class="info-grid">
+      <div class="info-card" onclick="toggleInfo('diet')">
+        <span class="info-icon">🥦</span>
+        <div class="info-title">Diet & Nutrition</div>
+        <div class="info-sub">What to eat and avoid</div>
+      </div>
+      <div class="info-card" onclick="toggleInfo('treatment')">
+        <span class="info-icon">💊</span>
+        <div class="info-title">Treatment Options</div>
+        <div class="info-sub">Medical & lifestyle approaches</div>
+      </div>
+      <div class="info-card" onclick="toggleInfo('mental')">
+        <span class="info-icon">🧠</span>
+        <div class="info-title">Mental Health</div>
+        <div class="info-sub">Emotions, anxiety & support</div>
+      </div>
+      <div class="info-card" onclick="toggleInfo('fertility')">
+        <span class="info-icon">🤱</span>
+        <div class="info-title">Fertility & PCOS</div>
+        <div class="info-sub">Pregnancy and options</div>
+      </div>
+      <div class="info-card" onclick="toggleInfo('labs')">
+        <span class="info-icon">🔬</span>
+        <div class="info-title">Understanding Labs</div>
+        <div class="info-sub">Hormones & blood tests explained</div>
+      </div>
+      <div class="info-card" onclick="toggleInfo('exercise')">
+        <span class="info-icon">🏃‍♀️</span>
+        <div class="info-title">Exercise Guide</div>
+        <div class="info-sub">Best workouts for PCOS</div>
+      </div>
+    </div>
+
+    <div class="info-detail" id="info-diet">
+      <h3>🥦 Diet & Nutrition for PCOS</h3>
+      <p>Diet is one of the most powerful tools for managing PCOS — especially for reducing insulin resistance, which affects up to 70% of women with PCOS.</p>
+      <p><strong>Foods to eat more of:</strong></p>
+      <ul>
+        <li>High-fiber vegetables (broccoli, spinach, kale, cauliflower)</li>
+        <li>Lean protein (chicken, fish, eggs, legumes, tofu)</li>
+        <li>Anti-inflammatory foods (berries, olive oil, fatty fish, nuts)</li>
+        <li>Low-glycemic carbs (sweet potato, quinoa, oats, brown rice)</li>
+        <li>Spearmint tea — shown to reduce androgen levels</li>
+      </ul>
+      <p><strong>Foods to reduce:</strong></p>
+      <ul>
+        <li>Refined sugars and white carbs (white bread, pastries, sugary drinks)</li>
+        <li>Processed and fried foods</li>
+        <li>Dairy (can trigger inflammation in some women with PCOS)</li>
+        <li>Alcohol — disrupts hormone balance</li>
+      </ul>
+    </div>
+
+    <div class="info-detail" id="info-treatment">
+      <h3>💊 PCOS Treatment Options</h3>
+      <p>PCOS has no cure, but symptoms are very manageable. Treatment is personalised — what works for one woman may differ for another.</p>
+      <p><strong>Lifestyle (first line of treatment):</strong></p>
+      <ul>
+        <li>Even 5–10% weight loss can restore regular periods</li>
+        <li>Low-glycemic diet reduces insulin and androgen levels</li>
+        <li>Regular exercise — especially strength training</li>
+      </ul>
+      <p><strong>Common medications your doctor may discuss:</strong></p>
+      <ul>
+        <li>Metformin — improves insulin sensitivity</li>
+        <li>Birth control pills — regulate periods and reduce androgens</li>
+        <li>Spironolactone — reduces hair growth and acne</li>
+        <li>Clomid or Letrozole — for fertility treatment</li>
+      </ul>
+      <p>Always work with your doctor to find the right plan for your body.</p>
+    </div>
+
+    <div class="info-detail" id="info-mental">
+      <h3>🧠 Mental Health & PCOS</h3>
+      <p>Women with PCOS are significantly more likely to experience anxiety, depression, and low self-esteem — and it's not just "in your head." Hormonal imbalances directly affect brain chemistry and mood.</p>
+      <ul>
+        <li>High androgens and insulin resistance can affect serotonin levels</li>
+        <li>Symptoms like acne and hair changes affect body image and confidence</li>
+        <li>Fertility concerns can cause grief and anxiety</li>
+        <li>Irregular cycles create unpredictability and stress</li>
+      </ul>
+      <p><strong>What helps:</strong></p>
+      <ul>
+        <li>Therapy — especially CBT (Cognitive Behavioural Therapy)</li>
+        <li>PCOS support communities (online and local)</li>
+        <li>Regular movement — exercise is proven to reduce PCOS-related anxiety</li>
+        <li>Sleep hygiene — poor sleep worsens insulin resistance and mood</li>
+      </ul>
+      <p>Your feelings are valid. PCOS is a real, complex condition — you deserve proper support.</p>
+    </div>
+
+    <div class="info-detail" id="info-fertility">
+      <h3>🤱 Fertility & PCOS</h3>
+      <p>PCOS is the leading cause of female infertility — but most women with PCOS can and do get pregnant, often with the right support.</p>
+      <p><strong>Why PCOS affects fertility:</strong></p>
+      <ul>
+        <li>Irregular or absent ovulation means fewer chances to conceive</li>
+        <li>Hormonal imbalances can affect egg quality</li>
+      </ul>
+      <p><strong>Options that help:</strong></p>
+      <ul>
+        <li>Lifestyle changes — weight loss can restore ovulation naturally</li>
+        <li>Letrozole or Clomid — medications that stimulate ovulation</li>
+        <li>Metformin — can improve ovulation in some women</li>
+        <li>IUI (intrauterine insemination)</li>
+        <li>IVF — effective for many women with PCOS</li>
+      </ul>
+      <p>Talk to a reproductive endocrinologist — they specialise in exactly this.</p>
+    </div>
+
+    <div class="info-detail" id="info-labs">
+      <h3>🔬 Understanding Your Lab Results</h3>
+      <p>PCOS is diagnosed using the Rotterdam Criteria — you need at least 2 of these 3 signs:</p>
+      <ul>
+        <li>Irregular or absent periods</li>
+        <li>High androgen levels (blood test or symptoms like acne/hair growth)</li>
+        <li>Polycystic ovaries on ultrasound</li>
+      </ul>
+      <p><strong>Common tests and what they mean:</strong></p>
+      <ul>
+        <li><strong>LH/FSH ratio</strong> — in PCOS, LH is often higher than FSH (normal ratio is 1:1)</li>
+        <li><strong>Total & free testosterone</strong> — elevated in many PCOS cases</li>
+        <li><strong>DHEA-S</strong> — another androgen; high levels suggest PCOS</li>
+        <li><strong>Fasting insulin & glucose</strong> — checks for insulin resistance</li>
+        <li><strong>AMH (Anti-Müllerian Hormone)</strong> — often elevated in PCOS</li>
+        <li><strong>Thyroid (TSH)</strong> — ruled out as thyroid issues mimic PCOS</li>
+      </ul>
+    </div>
+
+    <div class="info-detail" id="info-exercise">
+      <h3>🏃‍♀️ Best Exercise for PCOS</h3>
+      <p>Exercise is one of the most evidence-backed ways to improve PCOS symptoms — it reduces insulin resistance, lowers androgens, and lifts mood.</p>
+      <p><strong>Best types of exercise for PCOS:</strong></p>
+      <ul>
+        <li>Strength training (2–3x/week) — most effective for insulin sensitivity</li>
+        <li>Walking (30 min/day) — gentle but powerful for blood sugar control</li>
+        <li>HIIT (1–2x/week max) — effective but don't overdo it; too much raises cortisol</li>
+        <li>Yoga — reduces cortisol and improves hormonal balance</li>
+        <li>Swimming — low-impact, great for inflammation</li>
+      </ul>
+      <p><strong>What to avoid:</strong></p>
+      <ul>
+        <li>Over-exercising — raises cortisol which worsens PCOS</li>
+        <li>Extreme calorie restriction + intense cardio — stresses the body</li>
+      </ul>
+      <p>Start with 30 minutes of walking daily — it genuinely makes a difference.</p>
+    </div>
+
+    <div class="disclaimer">⚠️ For educational purposes only. Always consult a healthcare provider for medical advice.</div>
+  </div>
+
+  <!-- ===== MYTHS TAB ===== -->
+  <div id="tab-myths" style="display:none">
+    <div class="card" style="margin-bottom:0;padding:1rem 1.2rem;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:0;">Separating PCOS fact from fiction — because you deserve the truth. 💪</p>
+    </div>
+    <br>
+
+    <div class="myth-card">
+      <div class="myth-label">❌ Myth</div>
+      <div class="myth-text">"You can't get pregnant if you have PCOS."</div>
+      <div class="myth-divider"></div>
+      <div class="fact-label">✅ Fact</div>
+      <div class="fact-text">Most women with PCOS can get pregnant — often with lifestyle changes alone. Many others conceive with medications like Letrozole or through IVF. PCOS is the most treatable cause of infertility.</div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-label">❌ Myth</div>
+      <div class="myth-text">"PCOS only affects overweight women."</div>
+      <div class="myth-divider"></div>
+      <div class="fact-label">✅ Fact</div>
+      <div class="fact-text">About 20% of women with PCOS are lean. You can have normal or low body weight and still have PCOS. Weight is not a diagnostic criterion — hormones and symptoms are.</div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-label">❌ Myth</div>
+      <div class="myth-text">"If you have regular periods, you don't have PCOS."</div>
+      <div class="myth-divider"></div>
+      <div class="fact-label">✅ Fact</div>
+      <div class="fact-text">Some women with PCOS have regular periods but still meet diagnostic criteria through elevated androgens and polycystic ovaries. This is called "ovulatory PCOS."</div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-label">❌ Myth</div>
+      <div class="myth-text">"Birth control pills cure PCOS."</div>
+      <div class="myth-divider"></div>
+      <div class="fact-label">✅ Fact</div>
+      <div class="fact-text">The pill manages symptoms like irregular periods and acne, but it does not treat the underlying hormonal condition. PCOS symptoms often return when you stop taking it.</div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-label">❌ Myth</div>
+      <div class="myth-text">"PCOS is just a period problem."</div>
+      <div class="myth-divider"></div>
+      <div class="fact-label">✅ Fact</div>
+      <div class="fact-text">PCOS is a full-body hormonal and metabolic condition. It affects skin, hair, weight, mental health, insulin response, heart health, and fertility — not just your cycle.</div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-label">❌ Myth</div>
+      <div class="myth-text">"There's nothing you can do about PCOS."</div>
+      <div class="myth-divider"></div>
+      <div class="fact-label">✅ Fact</div>
+      <div class="fact-text">While there's no cure, PCOS is highly manageable. Diet, exercise, stress reduction, and the right medications can dramatically reduce symptoms and improve quality of life.</div>
+    </div>
+
+    <div class="disclaimer">⚠️ For educational purposes only. Always consult a healthcare provider for personal medical decisions.</div>
+  </div>
+</div>
+
+<script>
+  // TAB SWITCHING
+  function switchTab(tab) {
+    ['quiz','info','myths'].forEach(t => {
+      document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tab').forEach((el,i) => {
+      el.classList.toggle('active', ['quiz','info','myths'][i]===tab);
+    });
+  }
+
+  // QUIZ LOGIC
+  const scores = [0,0,0,0,0,0,0,0];
+  const selectedOptions = [null,null,null,null,null,null,null,null];
+  const symptomLabels = [
+    ['Regular periods','Slightly irregular periods','Very irregular periods','Absent periods'],
+    ['No acne','Mild acne','Moderate acne','Severe acne'],
+    ['No unusual hair growth','Some facial/body hair','Noticeable hirsutism'],
+    ['No hair thinning','Some hair fall','Noticeable scalp thinning'],
+    ['Stable weight','Easy weight gain','Difficulty losing weight','No weight concerns'],
+    ['Rare mood swings','Occasional mood swings','Frequent mood/anxiety issues'],
+    ['Normal energy','Occasional fatigue','Frequent fatigue'],
+    ['No insulin issues','Insulin resistance diagnosed','Insulin status unknown']
+  ];
+
+  function select(step, optionIndex, score) {
+    scores[step] = score;
+    selectedOptions[step] = optionIndex;
+    document.querySelectorAll('#step-'+step+' .option').forEach((el,i) => {
+      el.classList.toggle('selected', i===optionIndex);
+    });
+    document.getElementById('next-'+step).disabled = false;
+  }
+
+  function nextStep(current) {
+    document.getElementById('step-'+current).classList.remove('active');
+    document.getElementById('step-'+(current+1)).classList.add('active');
+    updateProgress(current+2);
+  }
+
+  function prevStep(current) {
+    document.getElementById('step-'+current).classList.remove('active');
+    document.getElementById('step-'+(current-1)).classList.add('active');
+    updateProgress(current);
+  }
+
+  function updateProgress(step) {
+    document.getElementById('progressFill').style.width = (step/8*100)+'%';
+  }
+
+  function showResult() {
+    document.getElementById('step-7').classList.remove('active');
+    document.getElementById('progressFill').style.width = '100%';
+    const total = scores.reduce((a,b)=>a+b,0);
+    const resultArea = document.getElementById('resultArea');
+    const badge = document.getElementById('resultBadge');
+    const title = document.getElementById('resultTitle');
+    const body = document.getElementById('resultBody');
+    const symptomsDiv = document.getElementById('resultSymptoms');
+    const nextStepsDiv = document.getElementById('nextSteps');
+
+    let level, badgeClass, titleText, bodyText, steps;
+
+    if (total <= 4) {
+      level='Low'; badgeClass='badge-low';
+      titleText='Your symptoms show a low likelihood of PCOS';
+      bodyText='Based on your answers, you have few of the common PCOS indicators. That said, every woman is different and only a doctor can rule it out completely. If you\'re concerned, it\'s always worth a conversation with your gynecologist.';
+      steps=['Track your cycle for 3 months using a free app like Flo or Clue','Note any recurring symptoms and bring them to your annual checkup','Maintain a balanced diet and regular exercise — good for everyone!'];
+    } else if (total <= 9) {
+      level='Moderate'; badgeClass='badge-medium';
+      titleText='Your symptoms suggest a moderate likelihood of PCOS';
+      bodyText='You\'re experiencing several symptoms commonly associated with PCOS. This doesn\'t mean you definitely have it — but it\'s worth investigating with a healthcare provider. You deserve clear answers.';
+      steps=['Book an appointment with your gynecologist or endocrinologist','Ask for: hormone panel (LH, FSH, testosterone, DHEA-S), fasting insulin & glucose, pelvic ultrasound','Start tracking your cycle, symptoms, and food in a journal or app','Consider reducing refined sugar and increasing protein in your diet'];
+    } else {
+      level='High'; badgeClass='badge-high';
+      titleText='Your symptoms strongly align with common PCOS indicators';
+      bodyText='You\'re experiencing many of the hallmark signs of PCOS. Please know — this is manageable, you are not alone, and there is so much that can be done. Getting a diagnosis is the first step to feeling better.';
+      steps=['See a gynecologist or endocrinologist as soon as possible','Request a full PCOS workup: hormones, ultrasound, fasting insulin','Start a low-glycemic diet and aim for 30 mins of walking daily','Bring this quiz summary to your doctor appointment','Join a PCOS support community — PCOS Awareness Association is a great start'];
+    }
+
+    badge.textContent = level+' likelihood';
+    badge.className = 'result-badge '+badgeClass;
+    title.textContent = titleText;
+    body.textContent = bodyText;
+
+    symptomsDiv.innerHTML = '';
+    selectedOptions.forEach((opt,i) => {
+      if(opt !== null && scores[i] > 0) {
+        const tag = document.createElement('span');
+        tag.className = 'symptom-tag';
+        tag.textContent = symptomLabels[i][opt];
+        symptomsDiv.appendChild(tag);
+      }
+    });
+
+    nextStepsDiv.innerHTML = '<h3>Your next steps</h3><ul>'+steps.map(s=>'<li>'+s+'</li>').join('')+'</ul>';
+    resultArea.style.display = 'block';
+  }
+
+  function retake() {
+    scores.fill(0); selectedOptions.fill(null);
+    document.getElementById('resultArea').style.display='none';
+    document.querySelectorAll('.quiz-step').forEach((el,i)=>{
+      el.classList.toggle('active',i===0);
+      el.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+    });
+    document.querySelectorAll('.btn-next').forEach(b=>b.disabled=true);
+    document.getElementById('progressFill').style.width='12.5%';
+  }
+
+  // INFO HUB
+  function toggleInfo(id) {
+    const detail = document.getElementById('info-'+id);
+    const isOpen = detail.classList.contains('open');
+    document.querySelectorAll('.info-detail').forEach(el=>el.classList.remove('open'));
+    document.querySelectorAll('.info-card').forEach(el=>el.classList.remove('open'));
+    if(!isOpen){ detail.classList.add('open'); event.currentTarget.classList.add('open'); }
+  }
+</script>
+</body>
+</html>
